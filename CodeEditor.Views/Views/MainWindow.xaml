@@ -5,21 +5,38 @@
     <DockPanel>
         <ToolBarTray DockPanel.Dock="Top" Background="DarkGray">
             <ToolBar>
-                <Button Content="Open File" Command="{Binding OpenFileCommand}" />
-                <Button Content="Select Folder" DataContext="{Binding FileExplorerVM}" Command="{Binding SelectFolderCommand}"/>
                 <Separator />
-                <Button Content="Save" Command="{Binding SaveFileCommand}" />
+                <!-- <Button Content="Open File" Command="{Binding OpenFileCommand}" /> -->
+                <Button Content="Open Folder" FontSize="20" DataContext="{Binding FileExplorerVM}" Command="{Binding SelectFolderCommand}"/>
                 <Separator />
+                <Button Command="{Binding SaveFileCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="pack://application:,,,/CodeEditor.Views;component/Resources/save-button.png" Height="20" Margin="0, 1, 5, 0" />
+                        <TextBlock FontSize="18">
+                            Save File
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <!-- <Button Command="{Binding SaveFileAsCommand}"> -->
+                <!--     <StackPanel Orientation="Horizontal"> -->
+                <!--         <Image Source="pack://application:,,,/CodeEditor.Views;component/Resources/save-button.png" Height="12" Margin="0, 1, 4, 0" /> -->
+                <!--         <TextBlock> -->
+                <!--             Save File -->
+                <!--         </TextBlock> -->
+                <!--     </StackPanel> -->
+                <!-- </Button> -->
+                <!-- <Separator /> -->
             </ToolBar>
         </ToolBarTray>
         
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="500" />
                 <RowDefinition />
-                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="450"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             
@@ -53,7 +70,11 @@
                 </ListView>
             </StackPanel>
             
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding CodeText}" Background="DarkGray" />
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical">
+                <TextBlock Text="{Binding SelectedFilePath}" MinHeight="30" Padding="5" />
+                <TextBox  Text="{Binding CodeText, UpdateSourceTrigger=PropertyChanged}" 
+                          Background="DarkGray" MinHeight="450" MaxHeight="450" VerticalScrollBarVisibility="Visible"/>
+            </StackPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -24,6 +24,8 @@
       <Resource Include="Resources\back-button.png" />
       <None Remove="Resources\up-arrow-button.png" />
       <Resource Include="Resources\up-arrow-button.png" />
+      <None Remove="Resources\save-button.png" />
+      <Resource Include="Resources\save-button.png" />
     </ItemGroup>
 
 </Project>

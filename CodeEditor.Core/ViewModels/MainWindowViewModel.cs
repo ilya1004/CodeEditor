@@ -1,8 +1,11 @@
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
 using CodeEditor.Core.Abstractions;
 using CodeEditor.Core.Commands;
+using CodeEditor.Core.Models;
 using Microsoft.Win32;
 // ReSharper disable InconsistentNaming
 
@@ -14,42 +17,56 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public FileExplorerViewModel FileExplorerVM { get; init; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
-    public MainWindowViewModel(IFileService fileService, FileExplorerViewModel fileExplorerViewModel)
+
+    private string _selectedFilePath = string.Empty;
+
+    public string SelectedFilePath
     {
-        _fileService = fileService;
-        FileExplorerVM = fileExplorerViewModel;
-        OpenFileCommand = new RelayCommand(OpenFile);
-        SaveFileCommand = new RelayCommand(SaveFile);
-    }
-    
-    private void OpenFile()
-    {
-        var openFileDialog = new OpenFileDialog();
-        if (openFileDialog.ShowDialog() == true)
+        get => _selectedFilePath;
+        set
         {
-            CodeText = _fileService.ReadFile(openFileDialog.FileName);
-        }
-    }
-    private void SaveFile()
-    {
-        var saveFileDialog = new SaveFileDialog();
-        if (saveFileDialog.ShowDialog() == true)
-        {
-            _fileService.SaveFile(saveFileDialog.FileName, CodeText);
+            _selectedFilePath = value;
+            OnPropertyChanged();
         }
     }
 
-    // Свойство для текста
     private string _codeText = string.Empty;
-    
+
     public string CodeText
     {
         get => _codeText;
         set
         {
+            if (string.IsNullOrEmpty(SelectedFilePath))
+            {
+                return;
+            }
             _codeText = value;
             OnPropertyChanged();
         }
+    }
+    public MainWindowViewModel(IFileService fileService, FileExplorerViewModel fileExplorerViewModel)
+    {
+        _fileService = fileService;
+        FileExplorerVM = fileExplorerViewModel;
+        SaveFileCommand = new RelayCommand(SaveFile);
+        OpenFileCommand = new RelayParamsCommand<FileSystemItem>(OpenFile!);
+    }
+    
+    private void OpenFile(FileSystemItem fileSystemItem)
+    {
+        SelectedFilePath = fileSystemItem.FullPath;
+        CodeText = _fileService.ReadFile(fileSystemItem.FullPath);
+    }
+    
+    private void SaveFile()
+    {
+        _fileService.SaveFile(SelectedFilePath, CodeText);
+    }
+
+    private bool CanSaveFile()
+    {
+        return !string.IsNullOrEmpty(SelectedFilePath) && Path.Exists(SelectedFilePath);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

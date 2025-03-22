@@ -96,10 +96,6 @@ public class FileExplorerViewModel : INotifyPropertyChanged
         {
             LoadFolder(item.FullPath);
         }
-        else
-        {
-            
-        }
     }
     
     private void GoBack()
