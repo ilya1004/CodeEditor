@@ -1,5 +1,5 @@
 using CodeEditor.Core.Abstractions.Data;
-using CodeEditor.Core.Models;
+using CodeEditor.Core.Entities;
 using CodeEditor.Infrastructure.Data;
 
 namespace CodeEditor.Infrastructure.Repositories;

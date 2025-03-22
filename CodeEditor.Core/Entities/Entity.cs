@@ -1,4 +1,4 @@
-namespace CodeEditor.Core.Models;
+namespace CodeEditor.Core.Entities;
 
 public abstract class Entity
 {

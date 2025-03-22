@@ -4,22 +4,24 @@ using System.Windows.Input;
 using CodeEditor.Core.Abstractions;
 using CodeEditor.Core.Commands;
 using Microsoft.Win32;
+// ReSharper disable InconsistentNaming
 
 namespace CodeEditor.Core.ViewModels;
 
 public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly IFileService _fileService;
-
-    public MainWindowViewModel(IFileService fileService)
+    public FileExplorerViewModel FileExplorerVM { get; init; }
+    public ICommand OpenFileCommand { get; }
+    public ICommand SaveFileCommand { get; }
+    public MainWindowViewModel(IFileService fileService, FileExplorerViewModel fileExplorerViewModel)
     {
         _fileService = fileService;
+        FileExplorerVM = fileExplorerViewModel;
         OpenFileCommand = new RelayCommand(OpenFile);
         SaveFileCommand = new RelayCommand(SaveFile);
     }
-
-    // Команда для открытия файла
-    public ICommand OpenFileCommand { get; }
+    
     private void OpenFile()
     {
         var openFileDialog = new OpenFileDialog();
@@ -28,9 +30,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
             CodeText = _fileService.ReadFile(openFileDialog.FileName);
         }
     }
-
-    // Команда для сохранения файла
-    public ICommand SaveFileCommand { get; }
     private void SaveFile()
     {
         var saveFileDialog = new SaveFileDialog();

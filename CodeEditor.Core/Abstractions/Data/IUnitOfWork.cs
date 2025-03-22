@@ -1,4 +1,4 @@
-using CodeEditor.Core.Models;
+using CodeEditor.Core.Entities;
 
 namespace CodeEditor.Core.Abstractions.Data;
 

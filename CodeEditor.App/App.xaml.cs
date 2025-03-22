@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Threading;
 using CodeEditor.Core.Abstractions;
 using CodeEditor.Core.Abstractions.Data;
-using CodeEditor.Core.Models;
+using CodeEditor.Core.Entities;
 using CodeEditor.Core.ViewModels;
 using CodeEditor.Infrastructure;
 using CodeEditor.Infrastructure.Data;
@@ -20,17 +20,12 @@ public partial class App : Application
 
     public App()
     {
-        DispatcherUnhandledException += OnDispatcherUnhandledException;
-        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
-        
-        
+        // DispatcherUnhandledException += OnDispatcherUnhandledException;
+        // AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         
         var services = new ServiceCollection();
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
-        LogError(new Exception("qweqweqwe"));
-        LogError(new Exception("qweqweqwe"));
-        LogError(new Exception("qweqweqwe"));
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -38,6 +33,7 @@ public partial class App : Application
         services.AddInfrastructure();
         
         services.AddSingleton<MainWindowViewModel>();
+        services.AddSingleton<FileExplorerViewModel>();
         services.AddSingleton<MainWindow>();
 
         services.AddTransient<IFileService, FileService>();

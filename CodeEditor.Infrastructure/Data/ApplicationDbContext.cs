@@ -1,4 +1,4 @@
-using CodeEditor.Core.Models;
+using CodeEditor.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodeEditor.Infrastructure.Data;
