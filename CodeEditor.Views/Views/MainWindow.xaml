@@ -1,0 +1,24 @@
+﻿<Window x:Class="CodeEditor.Views.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="880" Width="1460">
+    <DockPanel>
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar>
+                <Button Content="Открыть" Command="{Binding Com}" />
+                <Button Content="Сохранить" Command="{Binding SaveFileCommand}" />
+                <Separator />
+                <ComboBox Width="100" SelectedIndex="0">
+                    <ComboBoxItem>Option 1</ComboBoxItem>
+                    <ComboBoxItem>Option 2</ComboBoxItem>
+                    <ComboBoxItem>Option 3</ComboBoxItem>
+                </ComboBox>
+            </ToolBar>
+        </ToolBarTray>
+
+        <!-- Основное содержимое окна -->
+        <Grid>
+            <TextBox Text="{Binding CodeText}" />
+        </Grid>
+    </DockPanel>
+</Window>
