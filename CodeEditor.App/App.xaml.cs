@@ -1,15 +1,12 @@
-﻿using System.IO;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Threading;
 using CodeEditor.Core.Abstractions;
 using CodeEditor.Core.Abstractions.Data;
 using CodeEditor.Core.Entities;
 using CodeEditor.Core.ViewModels;
 using CodeEditor.Infrastructure;
-using CodeEditor.Infrastructure.Data;
 using CodeEditor.Infrastructure.Services;
 using CodeEditor.Views.Views;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CodeEditor.App;
@@ -20,8 +17,8 @@ public partial class App : Application
 
     public App()
     {
-        // DispatcherUnhandledException += OnDispatcherUnhandledException;
-        // AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
         
         var services = new ServiceCollection();
         ConfigureServices(services);

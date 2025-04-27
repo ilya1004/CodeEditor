@@ -2,11 +2,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Threading;
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Models;
 using Microsoft.Win32;
@@ -21,10 +17,10 @@ public class FileExplorerViewModel : INotifyPropertyChanged
     public ICommand GoUpCommand { get; set; }
     public ICommand GoBackCommand { get; set; }
 
-    private Stack<string> _navigationHistory = new();
+    private readonly Stack<string> _navigationHistory = new();
     
     private string _currentPath = "Select folder";
-    public string CurrentPath
+    private string CurrentPath
     {
         get => _currentPath;
         set
@@ -84,9 +80,9 @@ public class FileExplorerViewModel : INotifyPropertyChanged
                 });
             }
         }
-        catch
+        catch (Exception ex)
         {
-            // Игнорируем ошибки доступа
+            throw new Exception("Loading folder failed", ex);
         }
     }
 
@@ -146,7 +142,7 @@ public class FileExplorerViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }  
