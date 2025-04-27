@@ -1,11 +1,12 @@
 ﻿using System.Windows;
 using System.Windows.Threading;
-using CodeEditor.Core.Abstractions;
+using CodeEditor.Core;
 using CodeEditor.Core.Abstractions.Data;
+using CodeEditor.Core.Abstractions.Services;
 using CodeEditor.Core.Entities;
-using CodeEditor.Core.ViewModels;
 using CodeEditor.Infrastructure;
-using CodeEditor.Infrastructure.Services;
+using CodeEditor.Infrastructure.Data;
+using CodeEditor.Views.Services;
 using CodeEditor.Views.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,12 +29,11 @@ public partial class App : Application
     private void ConfigureServices(IServiceCollection services)
     {
         services.AddInfrastructure();
-        
-        services.AddSingleton<MainWindowViewModel>();
-        services.AddSingleton<FileExplorerViewModel>();
-        services.AddSingleton<MainWindow>();
+        services.AddCore();
 
-        services.AddTransient<IFileService, FileService>();
+        services.AddSingleton<MainWindow>();
+        
+        services.AddTransient<IDialogService, DialogService>();
     }
 
     protected override void OnStartup(StartupEventArgs e)
@@ -69,7 +69,7 @@ public partial class App : Application
             StackTrace = ex.StackTrace
         };
 
-        unitOfWork.ErrorLogRepository.AddAsync(errorLog);
+        unitOfWork.ErrorLogsRepository.AddAsync(errorLog);
         unitOfWork.SaveAllAsync();
     }
 }

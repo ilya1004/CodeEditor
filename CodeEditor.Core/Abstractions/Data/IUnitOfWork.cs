@@ -4,6 +4,7 @@ namespace CodeEditor.Core.Abstractions.Data;
 
 public interface IUnitOfWork
 {
-    IRepository<ErrorLog> ErrorLogRepository { get; }
+    IRepository<ErrorLog> ErrorLogsRepository { get; }
+    IRepository<Language> LanguagesRepository { get; }
     Task SaveAllAsync(CancellationToken cancellationToken = default);
 }

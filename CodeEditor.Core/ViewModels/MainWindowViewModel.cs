@@ -3,8 +3,9 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using System.Windows.Input;
-using CodeEditor.Core.Abstractions;
+using CodeEditor.Core.Abstractions.Services;
 using CodeEditor.Core.Commands;
 using CodeEditor.Core.Models;
 using ICSharpCode.AvalonEdit.Document;
@@ -15,20 +16,15 @@ namespace CodeEditor.Core.ViewModels;
 public class MainWindowViewModel : INotifyPropertyChanged
 {
     private readonly IFileService _fileService;
+    private readonly ILanguageService _languageService;
     public FileExplorerViewModel FileExplorerVM { get; init; }
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand RunCodeCommand { get; }
 
-    public ObservableCollection<string> Languages { get; } = ["Python", "Perl", "C#"];
-
-    private readonly Dictionary<string, string> _extensionToLanguage = new()
-    {
-        { ".py", "Python" },
-        { ".pl", "Perl" },
-        { ".cs", "C#" },
-        { ".csproj", "C#" }
-    };
+    public ObservableCollection<string> Languages { get; } = [];
+    private readonly Dictionary<string, string> _extensionToLanguage = new();
+    private readonly Dictionary<string, string> _languageToRunCommand = new();
 
     private string _selectedFilePath = string.Empty;
     public string SelectedFilePath
@@ -89,13 +85,39 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public MainWindowViewModel(IFileService fileService, FileExplorerViewModel fileExplorerViewModel)
+    public MainWindowViewModel(IFileService fileService, ILanguageService languageService, IDialogService dialogService, FileExplorerViewModel fileExplorerViewModel)
     {
         _fileService = fileService;
+        _languageService = languageService;
         FileExplorerVM = fileExplorerViewModel;
         SaveFileCommand = new RelayCommand(SaveFile);
         OpenFileCommand = new RelayParamsCommand<FileSystemItem>(OpenFile!);
         RunCodeCommand = new RelayCommand(RunCode, CanRunCode);
+
+        InitializeLanguagesAsync().GetAwaiter().GetResult();
+    }
+
+    private async Task InitializeLanguagesAsync()
+    {
+        try
+        {
+            var languages = await _languageService.GetAllLanguagesAsync();
+            foreach (var language in languages)
+            {
+                Languages.Add(language.Name);
+                _languageToRunCommand[language.Name] = language.RunCommand;
+            }
+
+            var extensionMap = await _languageService.GetExtensionToLanguageMapAsync();
+            foreach (var kvp in extensionMap)
+            {
+                _extensionToLanguage[kvp.Key] = kvp.Value;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Failed to load languages from database: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
     
     private void OpenFile(FileSystemItem fileSystemItem)
@@ -105,7 +127,6 @@ public class MainWindowViewModel : INotifyPropertyChanged
         CodeDocument.Text = content;
         var extension = Path.GetExtension(fileSystemItem.FullPath).ToLower();
         SelectedLanguage = _extensionToLanguage.GetValueOrDefault(extension);
-
         UpdateSyntaxHighlighting();
     }
     
@@ -130,13 +151,19 @@ public class MainWindowViewModel : INotifyPropertyChanged
             return;
         }
 
-        LaunchParameters = SelectedLanguage switch
+        if (SelectedLanguage != null && _languageToRunCommand.TryGetValue(SelectedLanguage, out var runCommand))
         {
-            "Python" => $"python \"{SelectedFilePath}\"",
-            "Perl" => $"perl \"{Path.GetFileName(SelectedFilePath)}\"",
-            "C#" => GetCSharpLaunchCommand(),
-            _ => string.Empty
-        };
+            LaunchParameters = SelectedLanguage switch
+            {
+                "Perl" => $"perl \"{Path.GetFileName(SelectedFilePath)}\"",
+                "C#" => GetCSharpLaunchCommand(),
+                _ => string.Format(runCommand, SelectedFilePath)
+            };
+        }
+        else
+        {
+            LaunchParameters = string.Empty;
+        }
     }
 
     private string GetCSharpLaunchCommand()
@@ -177,6 +204,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             "Python" => HighlightingManager.Instance.GetDefinition("Python"),
             "Perl" => HighlightingManager.Instance.GetDefinition("Perl"),
             "C#" => HighlightingManager.Instance.GetDefinition("C#"),
+            "JavaScript" => HighlightingManager.Instance.GetDefinition("JavaScript"),
             _ => HighlightingManager.Instance.GetDefinitionByExtension(extension)
         };
     }

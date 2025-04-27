@@ -89,7 +89,6 @@ ClientBin/
 *~
 *.dbmdl
 *.[Pp]ublish.xml
-*.db
 
 # =========================
 # Windows detritus

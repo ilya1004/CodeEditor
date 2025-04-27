@@ -26,6 +26,18 @@
       <Resource Include="Resources\up-arrow-button.png" />
       <None Remove="Resources\save-button.png" />
       <Resource Include="Resources\save-button.png" />
+      <None Remove="Resources\folder-button.png" />
+      <None Remove="Resources\pngkit_folder-icon-png_1328829.png" />
+      <Resource Include="Resources\open-folder-button.png" />
+      <None Remove="Resources\new-file-button.png" />
+      <Resource Include="Resources\new-file-button.png" />
+      <None Remove="Resources\new-folder-button.png" />
+      <None Remove="Resources\new-folder.png" />
+      <Resource Include="Resources\new-folder-button.png" />
+      <None Remove="Resources\delete-button.png" />
+      <Resource Include="Resources\delete-button.png" />
+      <None Remove="Resources\edit-button.png" />
+      <Resource Include="Resources\edit-button.png" />
     </ItemGroup>
 
 </Project>
