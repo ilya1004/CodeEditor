@@ -21,6 +21,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
     public ICommand OpenFileCommand { get; }
     public ICommand SaveFileCommand { get; }
     public ICommand RunCodeCommand { get; }
+    public ICommand OpenDocumentationCommand { get; }
 
     public ObservableCollection<string> Languages { get; } = [];
     private readonly Dictionary<string, string> _extensionToLanguage = new();
@@ -36,6 +37,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
             OnPropertyChanged();
             UpdateSyntaxHighlighting();
             UpdateLaunchParameters();
+            OnPropertyChanged(nameof(CanSelectLanguage));
         }
     }
 
@@ -85,7 +87,9 @@ public class MainWindowViewModel : INotifyPropertyChanged
         }
     }
 
-    public MainWindowViewModel(IFileService fileService, ILanguageService languageService, IDialogService dialogService, FileExplorerViewModel fileExplorerViewModel)
+    public bool CanSelectLanguage => !string.IsNullOrEmpty(SelectedFilePath);
+
+    public MainWindowViewModel(IFileService fileService, ILanguageService languageService, FileExplorerViewModel fileExplorerViewModel)
     {
         _fileService = fileService;
         _languageService = languageService;
@@ -93,6 +97,7 @@ public class MainWindowViewModel : INotifyPropertyChanged
         SaveFileCommand = new RelayCommand(SaveFile);
         OpenFileCommand = new RelayParamsCommand<FileSystemItem>(OpenFile!);
         RunCodeCommand = new RelayCommand(RunCode, CanRunCode);
+        OpenDocumentationCommand = new RelayCommand(OpenDocumentation, CanOpenDocumentation);
 
         InitializeLanguagesAsync().GetAwaiter().GetResult();
     }
@@ -145,13 +150,14 @@ public class MainWindowViewModel : INotifyPropertyChanged
 
     private void UpdateLaunchParameters()
     {
-        if (string.IsNullOrEmpty(SelectedFilePath))
+        if (string.IsNullOrEmpty(SelectedFilePath) || string.IsNullOrEmpty(SelectedLanguage))
         {
             LaunchParameters = string.Empty;
             return;
         }
 
-        if (SelectedLanguage != null && _languageToRunCommand.TryGetValue(SelectedLanguage, out var runCommand))
+        var language = _languageService.GetLanguageByNameAsync(SelectedLanguage).GetAwaiter().GetResult();
+        if (language != null && language.IsExecutable && _languageToRunCommand.TryGetValue(SelectedLanguage, out var runCommand))
         {
             LaunchParameters = SelectedLanguage switch
             {
@@ -205,6 +211,12 @@ public class MainWindowViewModel : INotifyPropertyChanged
             "Perl" => HighlightingManager.Instance.GetDefinition("Perl"),
             "C#" => HighlightingManager.Instance.GetDefinition("C#"),
             "JavaScript" => HighlightingManager.Instance.GetDefinition("JavaScript"),
+            "HTML" => HighlightingManager.Instance.GetDefinition("HTML"),
+            "CSS" => HighlightingManager.Instance.GetDefinition("CSS"),
+            "SQL" => HighlightingManager.Instance.GetDefinition("SQL"),
+            "JSON" => HighlightingManager.Instance.GetDefinition("JSON"),
+            "YAML" => HighlightingManager.Instance.GetDefinition("YAML"),
+            "Markdown" => HighlightingManager.Instance.GetDefinition("Markdown"),
             _ => HighlightingManager.Instance.GetDefinitionByExtension(extension)
         };
     }
@@ -230,7 +242,43 @@ public class MainWindowViewModel : INotifyPropertyChanged
     
     private bool CanRunCode()
     {
-        return !string.IsNullOrEmpty(SelectedFilePath) && !string.IsNullOrEmpty(SelectedLanguage) && File.Exists(SelectedFilePath);
+        if (string.IsNullOrEmpty(SelectedFilePath) || string.IsNullOrEmpty(SelectedLanguage) || !File.Exists(SelectedFilePath))
+            return false;
+
+        var language = _languageService.GetLanguageByNameAsync(SelectedLanguage).GetAwaiter().GetResult();
+        return language?.IsExecutable == true;
+    }
+
+    private void OpenDocumentation()
+    {
+        if (string.IsNullOrEmpty(SelectedLanguage))
+            return;
+
+        var language = _languageService.GetLanguageByNameAsync(SelectedLanguage).GetAwaiter().GetResult();
+        if (language != null && !string.IsNullOrEmpty(language.DocumentationUrl))
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = language.DocumentationUrl,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open documentation: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+
+    private bool CanOpenDocumentation()
+    {
+        if (string.IsNullOrEmpty(SelectedLanguage))
+            return false;
+
+        var language = _languageService.GetLanguageByNameAsync(SelectedLanguage).GetAwaiter().GetResult();
+        return language != null && !string.IsNullOrEmpty(language.DocumentationUrl);
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -38,6 +38,8 @@
       <Resource Include="Resources\delete-button.png" />
       <None Remove="Resources\edit-button.png" />
       <Resource Include="Resources\edit-button.png" />
+      <None Remove="Resources\google-docs.png" />
+      <Resource Include="Resources\doc-button.png" />
     </ItemGroup>
 
 </Project>

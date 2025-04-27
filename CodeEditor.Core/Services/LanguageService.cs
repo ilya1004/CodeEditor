@@ -28,4 +28,9 @@ public class LanguageService(IUnitOfWork unitOfWork) : ILanguageService
 
         return map;
     }
+
+    public async Task<Language?> GetLanguageByNameAsync(string name)
+    {
+        return await unitOfWork.LanguagesRepository.FirstOrDefaultAsync(l => l.Name == name);
+    }
 }

@@ -34,7 +34,7 @@
                         </TextBlock>
                     </StackPanel>
                 </Button>
-                <Separator Width="2" />
+                <Separator Width="3" />
                 <Button
                     FontSize="18"
                     DataContext="{Binding FileExplorerVM}" Command="{Binding CreateFileCommand}">
@@ -49,18 +49,6 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button Command="{Binding SaveFileCommand}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image 
-                            Source="pack://application:,,,/CodeEditor.Views;component/Resources/save-button.png" 
-                            Height="25" 
-                            Margin="0, 1, 5, 0" />
-                        <TextBlock FontSize="18">
-                            Save File
-                        </TextBlock>
-                    </StackPanel>
-                </Button>
-                <Separator Width="2" />
                 <Button
                     FontSize="18"
                     DataContext="{Binding FileExplorerVM}" Command="{Binding RenameItemCommand}">
@@ -85,6 +73,30 @@
                             Margin="0, 1, 5, 0" />
                         <TextBlock FontSize="18">
                             Delete Item
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Separator />
+                <Button Command="{Binding SaveFileCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image 
+                            Source="pack://application:,,,/CodeEditor.Views;component/Resources/save-button.png" 
+                            Height="25" 
+                            Margin="0, 1, 5, 0" />
+                        <TextBlock FontSize="18">
+                            Save File
+                        </TextBlock>
+                    </StackPanel>
+                </Button>
+                <Separator Width="3"/>
+                <Button Command="{Binding OpenDocumentationCommand}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image 
+                            Source="pack://application:,,,/CodeEditor.Views;component/Resources/doc-button.png" 
+                            Height="25" 
+                            Margin="0, 1, 5, 0" />
+                        <TextBlock FontSize="18">
+                            Documentation
                         </TextBlock>
                     </StackPanel>
                 </Button>
@@ -136,6 +148,7 @@
                 <TextBlock Text="Select Language:" FontSize="14" Margin="10,10,10,0"/>
                 <ComboBox ItemsSource="{Binding DataContext.Languages, RelativeSource={RelativeSource AncestorType=Window}}" 
                           SelectedItem="{Binding DataContext.SelectedLanguage, RelativeSource={RelativeSource AncestorType=Window}}" 
+                          IsEnabled="{Binding DataContext.CanSelectLanguage, RelativeSource={RelativeSource AncestorType=Window}}"
                           Width="200"
                           Margin="10,5,10,0"/>
                 <TextBlock Text="Launch Parameters:" FontSize="14" Margin="10,10,10,0"/>

@@ -6,4 +6,5 @@ public interface ILanguageService
 {
     Task<List<Language>> GetAllLanguagesAsync();
     Task<Dictionary<string, string>> GetExtensionToLanguageMapAsync();
+    Task<Language?> GetLanguageByNameAsync(string name);
 }

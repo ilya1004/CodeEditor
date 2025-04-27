@@ -1,3 +1,4 @@
+using System.IO;
 using CodeEditor.Core.Abstractions.Data;
 using CodeEditor.Core.Abstractions.Services;
 using CodeEditor.Infrastructure.Data;
@@ -12,8 +13,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
+        var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        var dbPath = Path.Combine(baseDir, "..", "..", "..", "..", "code-editor.db");
+        
         services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite("Data Source=..\\code-editor.db"));
+            options.UseSqlite($"Data Source={dbPath}"));
 
         services.AddTransient<IUnitOfWork, AppUnitOfWork>();
         
